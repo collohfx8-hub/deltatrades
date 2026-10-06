@@ -4,6 +4,26 @@ A self-hosted, visual trading-bot builder on the Deriv WebSocket API. Drag-and-d
 strategy building with Blockly, an interactive SmartCharts chart, automated strategy
 execution, and dashboard/tutorials.
 
+## Deltatrades Workspaces
+
+The existing navigation also includes **Freebots**, **Live premium signals**, and
+**Free signal tool**. Freebots contains the eleven uploaded XML strategies, with
+search and one-click import into the existing Bot Builder. Loading a strategy does
+not start trading; review its parameters and test on a demo account first. Imports
+are blocked while a bot is running or an open contract is pending.
+
+Both signal workspaces currently show an explicit awaiting-integration state. The
+premium signal source code is being supplied separately; no live feed, simulated
+signals, or premium access restrictions have been added yet. The free signal tool
+also awaits its implementation.
+
+Deriv sign-in uses the existing OAuth/PKCE integration. The registered redirect URI
+must exactly match the deployed site's origin, including the scheme and port when
+applicable. OAuth, account requests, and WebSocket connections use the same Deriv
+environment; an unset environment defaults to production. After changing the app
+registration or build-time configuration, redeploy and verify a complete sign-in on
+the deployed domain.
+
 > **Note:** Unlike the other templates in this repo (Rise/Fall, Accumulators, Digits)
 > which are **Next.js** apps, the bot is a **[Rsbuild](https://rsbuild.dev) + React
 > Router** single-page app. The commands, build output, and environment variables
