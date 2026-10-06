@@ -7,6 +7,7 @@ import {
     resolveReferralViaProxy,
 } from '@/external/deriv-core';
 import type { AuthConfig } from '@/external/deriv-core';
+import { getDerivEnvironment } from '@/external/deriv-core/config/urls';
 import { DerivWSAccountsService } from '@/services/derivws-accounts.service';
 import brandConfig from '../../../../../brand.config.json';
 
@@ -34,19 +35,8 @@ export const WS_SERVERS = {
 // Helper Functions
 // =============================================================================
 
-// Helper to check if we're on production.
-// NEXT_PUBLIC_DERIV_ENV is the authoritative signal (set at build/deploy time and
-// also read by vendored deriv-core for OAuth), so a deployed partner domain resolves the
-// same environment for WebSocket and OAuth. Falls back to hostname detection when
-// the env var is unset (e.g. local dev).
 export const isProduction = () => {
-    const env = process.env.NEXT_PUBLIC_DERIV_ENV;
-    if (env === 'production') return true;
-    if (env === 'preview' || env === 'staging') return false;
-
-    const hostname = window.location.hostname;
-    const productionDomains = Object.values(PRODUCTION_DOMAINS) as string[];
-    return productionDomains.includes(hostname);
+    return getDerivEnvironment() === 'production';
 };
 
 export const isLocal = () => /localhost(:\d+)?$/i.test(window.location.hostname);

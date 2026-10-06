@@ -77,6 +77,13 @@
             &__list {
                 background: var(--general-section-1);
                 justify-content: start;
+                overflow-x: auto;
+                overflow-y: hidden;
+
+                > li {
+                    flex-shrink: 0;
+                    white-space: nowrap;
+                }
 
                 @include mobile-or-tablet-screen {
                     overflow-x: auto;
