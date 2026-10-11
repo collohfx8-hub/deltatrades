@@ -2,7 +2,7 @@
 import React, { lazy, Suspense, useEffect, useState } from 'react';
 import classNames from 'classnames';
 import { observer } from 'mobx-react-lite';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router';
 import ChunkLoader from '@/components/loader/chunk-loader';
 import { generateOAuthURL } from '@/components/shared';
 import DesktopWrapper from '@/components/shared_ui/desktop-wrapper';
@@ -42,8 +42,6 @@ import RunPanel from '../../components/run-panel';
 import ChartModal from '../chart/chart-modal';
 import Dashboard from '../dashboard';
 import RunStrategy from '../dashboard/run-strategy';
-import Freebots from '../freebots/freebots';
-import SignalWorkspace from '../signals/signal-workspace';
 import './main.scss';
 
 const ChartWrapper = lazy(() => import('../chart/chart-wrapper'));
@@ -80,7 +78,7 @@ const AppWrapper = observer(() => {
     const { clear } = summary_card;
     const { DASHBOARD, BOT_BUILDER } = DBOT_TABS;
     const init_render = React.useRef(true);
-    const hash = ['dashboard', 'bot_builder', 'chart', 'tutorial', 'freebots', 'premium_signals', 'free_signal_tool'];
+    const hash = ['dashboard', 'bot_builder', 'chart', 'tutorial'];
     const { isDesktop } = useDevice();
     const location = useLocation();
     const navigate = useNavigate();
@@ -128,8 +126,7 @@ const AppWrapper = observer(() => {
     const GetHashedValue = (tab: number) => {
         tab_value = location.hash?.split('#')[1];
         if (!tab_value) return is_preview_mode ? BOT_BUILDER : tab;
-        const tab_index = hash.indexOf(String(tab_value));
-        return tab_index < 0 ? DASHBOARD : tab_index;
+        return Number(hash.indexOf(String(tab_value)));
     };
     const active_hash_tab = GetHashedValue(active_tab);
 
@@ -147,7 +144,7 @@ const AppWrapper = observer(() => {
 
     React.useEffect(() => {
         const el_dashboard = document.getElementById('id-dbot-dashboard');
-        const el_tutorial = document.getElementById('id-free-signal-tool');
+        const el_tutorial = document.getElementById('id-tutorials');
 
         const observer_dashboard = new window.IntersectionObserver(
             ([entry]) => {
@@ -178,10 +175,6 @@ const AppWrapper = observer(() => {
         );
         observer_dashboard.observe(el_dashboard);
         observer_tutorial.observe(el_tutorial);
-        return () => {
-            observer_dashboard.disconnect();
-            observer_tutorial.disconnect();
-        };
     });
 
     React.useEffect(() => {
@@ -458,15 +451,6 @@ const AppWrapper = observer(() => {
                                         <Tutorial handleTabChange={handleTabChange} />
                                     </Suspense>
                                 </div>
-                            </div>
-                            <div label={localize('Freebots')} id='id-freebots'>
-                                <Freebots />
-                            </div>
-                            <div label={localize('Live premium signals')} id='id-premium-signals'>
-                                <SignalWorkspace premium />
-                            </div>
-                            <div label={localize('Free signal tool')} id='id-free-signal-tool'>
-                                <SignalWorkspace />
                             </div>
                         </Tabs>
                         {!isDesktop && right_tab_shadow && <span className='tabs-shadow tabs-shadow--right' />}{' '}

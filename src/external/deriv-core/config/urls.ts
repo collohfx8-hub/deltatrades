@@ -1,11 +1,11 @@
 type DerivEnv = 'production' | 'preview';
 
-export function getDerivEnvironment(): DerivEnv {
+function getEnv(): DerivEnv {
   // `process.env.NEXT_PUBLIC_DERIV_ENV` is statically replaced at build time by
   // rsbuild's `source.define`. Do NOT guard on `typeof process` — the bare
   // `process` identifier is not defined, so it is `'undefined'` in the browser
   // and would short-circuit this to the production fallback even on staging.
-  return ['preview', 'staging'].includes(process.env.NEXT_PUBLIC_DERIV_ENV ?? '') ? 'preview' : 'production';
+  return process.env.NEXT_PUBLIC_DERIV_ENV === 'preview' ? 'preview' : 'production';
 }
 
 const URLS = {
@@ -24,15 +24,15 @@ const URLS = {
 } as const;
 
 export function getAuthBaseUrl(): string {
-  return URLS[getDerivEnvironment()].authBase;
+  return URLS[getEnv()].authBase;
 }
 
 export function getApiBaseUrl(): string {
-  return URLS[getDerivEnvironment()].apiBase;
+  return URLS[getEnv()].apiBase;
 }
 
 export function getPublicWsUrl(): string {
-  return URLS[getDerivEnvironment()].publicWs;
+  return URLS[getEnv()].publicWs;
 }
 
 /**
@@ -40,5 +40,5 @@ export function getPublicWsUrl(): string {
  * affiliate-resolution proxy. Derived from NEXT_PUBLIC_DERIV_ENV.
  */
 export function getAppBuilderBaseUrl(): string {
-  return URLS[getDerivEnvironment()].appBuilder;
+  return URLS[getEnv()].appBuilder;
 }

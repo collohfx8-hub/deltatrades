@@ -17,6 +17,12 @@ export interface AuthConfig {
   utmSource?: string;
   /** UTM medium (e.g., 'affiliate') — sign-up attribution only */
   utmMedium?: string;
+  /**
+   * The language the app is currently rendering in, upper-cased onto the
+   * authorize URL so Deriv's login continues in it. Omitted rather than
+   * defaulted when absent: no `lang` lets Deriv resolve its own.
+   */
+  lang?: string;
 }
 
 export interface AuthInfo {

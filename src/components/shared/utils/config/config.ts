@@ -7,7 +7,7 @@ import {
     resolveReferralViaProxy,
 } from '@/external/deriv-core';
 import type { AuthConfig } from '@/external/deriv-core';
-import { getDerivEnvironment } from '@/external/deriv-core/config/urls';
+import { getInitialLanguage } from '@deriv-com/translations';
 import { DerivWSAccountsService } from '@/services/derivws-accounts.service';
 import brandConfig from '../../../../../brand.config.json';
 
@@ -35,8 +35,19 @@ export const WS_SERVERS = {
 // Helper Functions
 // =============================================================================
 
+// Helper to check if we're on production.
+// NEXT_PUBLIC_DERIV_ENV is the authoritative signal (set at build/deploy time and
+// also read by vendored deriv-core for OAuth), so a deployed partner domain resolves the
+// same environment for WebSocket and OAuth. Falls back to hostname detection when
+// the env var is unset (e.g. local dev).
 export const isProduction = () => {
-    return getDerivEnvironment() === 'production';
+    const env = process.env.NEXT_PUBLIC_DERIV_ENV;
+    if (env === 'production') return true;
+    if (env === 'preview' || env === 'staging') return false;
+
+    const hostname = window.location.hostname;
+    const productionDomains = Object.values(PRODUCTION_DOMAINS) as string[];
+    return productionDomains.includes(hostname);
 };
 
 export const isLocal = () => /localhost(:\d+)?$/i.test(window.location.hostname);
@@ -97,6 +108,13 @@ export const generateOAuthURL = async (prompt?: string): Promise<string> => {
             clientId,
             redirectUri: window.location.origin,
             scopes: 'trade',
+            // Without this a Bot deployed in ES/FR/PT sends its clients to an
+            // English login (#804). `getInitialLanguage()` is the same reader
+            // `url-redirect-utils` and `transfer-utils` use for their own `lang`
+            // params, and resolves exactly what the app booted in: the boot
+            // clamp in `app/i18n.ts` has already dropped any code this build
+            // cannot render, and a switch from the footer reloads the page.
+            lang: getInitialLanguage(),
         };
 
         // Static referral link (fallback for direct visits without affiliate click)
