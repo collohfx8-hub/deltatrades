@@ -406,8 +406,10 @@ const getAllRequiredBlocks = (workspace, required_block_types) => {
 };
 
 const getMissingBlocks = (workspace, required_block_types) => {
+    const { purchaseBlockTypes } = config();
     return required_block_types.filter(blockType => {
-        return !workspace.getAllBlocks().some(block => block.type === blockType);
+        const accepted_types = blockType === 'purchase' ? purchaseBlockTypes : [blockType];
+        return !workspace.getAllBlocks().some(block => accepted_types.includes(block.type));
     });
 };
 

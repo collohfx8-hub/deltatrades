@@ -10,11 +10,16 @@ let purchase_reference;
 
 export default Engine =>
     class Purchase extends Engine {
-        purchase(contract_type) {
+        purchase(contract_type, purchase_options = {}) {
             // Prevent calling purchase twice
             if (this.store.getState().scope !== BEFORE_PURCHASE) {
                 return Promise.resolve();
             }
+
+            // Optional per-purchase overrides used by custom blocks (e.g. apollo_purchase / apollo_purchase2)
+            const { prediction } = purchase_options || {};
+            const has_prediction_override = prediction !== undefined && prediction !== null && prediction !== '';
+            const quantity = Math.min(Math.max(parseInt(purchase_options?.quantity, 10) || 1, 1), 100);
 
             const onSuccess = response => {
                 // Don't unnecessarily send a forget request for a purchased contract.
@@ -43,6 +48,14 @@ export default Engine =>
                     buy_price: buy.buy_price,
                 });
             };
+
+            if (has_prediction_override || quantity > 1) {
+                return this.purchaseWithOverrides(
+                    contract_type,
+                    { has_prediction_override, prediction, quantity },
+                    onSuccess
+                );
+            }
 
             if (this.is_proposal_subscription_required) {
                 const { id, askPrice } = this.selectProposal(contract_type);
@@ -113,6 +126,39 @@ export default Engine =>
                 ['PriceMoved', 'InvalidContractProposal'],
                 delayIndex++
             ).then(onSuccess);
+        }
+        purchaseWithOverrides(contract_type, { has_prediction_override, prediction, quantity }, onSuccess) {
+            const trade_options = has_prediction_override
+                ? { ...this.tradeOptions, prediction: Number(prediction) }
+                : this.tradeOptions;
+            const trade_option = tradeOptionToBuy(contract_type, trade_options);
+            const action = () => api_base.api.send(trade_option);
+
+            this.isSold = false;
+
+            contractStatus({
+                id: 'contract.purchase_sent',
+                data: trade_options.amount,
+            });
+
+            // The first contract is tracked by the bot (during/after purchase), any additional
+            // contracts are bought alongside it and logged.
+            const extra_purchases = Array.from({ length: quantity - 1 }, () =>
+                doUntilDone(action)
+                    .then(({ buy }) => {
+                        log(LogTypes.PURCHASE, { transaction_id: buy.transaction_id });
+                        info({
+                            accountID: this.accountInfo.loginid,
+                            totalRuns: this.updateAndReturnTotalRuns(),
+                            transaction_ids: { buy: buy.transaction_id },
+                            contract_type,
+                            buy_price: buy.buy_price,
+                        });
+                    })
+                    .catch(() => {})
+            );
+
+            return Promise.all([doUntilDone(action).then(onSuccess), ...extra_purchases]).then(([result]) => result);
         }
         getPurchaseReference = () => purchase_reference;
         regeneratePurchaseReference = () => {

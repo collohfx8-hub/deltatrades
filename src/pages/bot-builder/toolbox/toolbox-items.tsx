@@ -161,6 +161,14 @@ export const ToolboxItems = () =>
             <Category id='purchase_conditions' name={localize('Purchase conditions')}>
                 <Block type='before_purchase' />
                 <Block type='purchase' />
+                <Block type='apollo_purchase' />
+                <Block type='apollo_purchase2'>
+                    <Value name='PREDICTION'>
+                        <Shadow type='math_number_positive'>
+                            <Field name='NUM'>4</Field>
+                        </Shadow>
+                    </Value>
+                </Block>
             </Category>
             <Category id='sell_conditions' name={localize('Sell conditions (optional)')}>
                 <Block type='during_purchase' />
@@ -428,6 +436,11 @@ export const ToolboxItems = () =>
                 <Category name={localize('Custom functions')} id='custom_functions' dynamic='PROCEDURE' />
 
                 <Category name={localize('Variables')} id='variables' dynamic='VARIABLE' />
+
+                <Category name={localize('Variable options')} id='variable_options'>
+                    <Block type='variables_set_option' />
+                    <Block type='variables_is_option' />
+                </Category>
 
                 <Category name={localize('Notifications')} id='notifications'>
                     <Block type='text_print'>
