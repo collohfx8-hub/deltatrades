@@ -206,6 +206,8 @@ export const config = () => ({
     ],
     mainBlocks: ['trade_definition', 'before_purchase', 'during_purchase', 'after_purchase'],
     mandatoryMainBlocks: ['trade_definition', 'purchase', 'before_purchase'],
+    // Block types that satisfy the mandatory 'purchase' block requirement (custom blocks included)
+    purchaseBlockTypes: ['purchase', 'apollo_purchase', 'apollo_purchase2'],
     procedureDefinitionBlocks: ['procedures_defnoreturn', 'procedures_defreturn'],
     single_instance_blocks: ['trade_definition', 'before_purchase', 'during_purchase', 'after_purchase'],
     TRADE_TYPE_TO_CONTRACT_CATEGORY_MAPPING: {
