@@ -10,3 +10,31 @@
         margin-top: 6rem;
     }
 }
+
+.deriv-auth-error {
+    position: fixed;
+    bottom: 2rem;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 1001;
+    display: flex;
+    align-items: center;
+    gap: 2rem;
+    width: min(64rem, calc(100% - 3.2rem));
+    padding: 1.6rem;
+    background: #3c2725;
+    border: 1px solid #986c63;
+    color: #eef0eb;
+    border-radius: 0.8rem;
+    font-size: 1.3rem;
+    line-height: 1.6;
+
+    button {
+        background: transparent;
+        border: 1px solid #c5aa75;
+        color: #eef0eb;
+        border-radius: 0.4rem;
+        padding: 0.6rem 1rem;
+        cursor: pointer;
+    }
+}
