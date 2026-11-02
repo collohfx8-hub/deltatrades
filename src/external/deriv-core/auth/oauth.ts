@@ -167,8 +167,7 @@ export async function exchangeCodeForTokens(params: TokenExchangeParams): Promis
   });
 
   if (!response.ok) {
-    const errorBody = await response.text();
-    throw new OAuthError(`Token exchange failed (${response.status}): ${errorBody}`);
+    throw new OAuthError(`Token exchange failed (${response.status})`);
   }
 
   const tokenData = await response.json();
@@ -262,7 +261,7 @@ export function cleanupUrl(baseUrl: string): void {
   const paramsToRemove = ['code', 'state', 'scope', 'error', 'error_description'];
   paramsToRemove.forEach((param) => url.searchParams.delete(param));
 
-  window.history.replaceState(window.history.state, '', url.pathname + url.search);
+  window.history.replaceState(window.history.state, '', url.pathname + url.search + url.hash);
 }
 
 /**
